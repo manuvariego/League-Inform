@@ -1,4 +1,4 @@
-module awesome
+module leagueinform
 
 go 1.23.0
 
