@@ -10,7 +10,8 @@ import (
 
 func RunServer() {
 	err := godotenv.Load()
-  http.HandleFunc("/matches", HandleUserMatches)
+  //need a router to grab ID from the URL and pass it to the function
+  http.HandleFunc("/matches", GetRiotPuuid)
 	err = http.ListenAndServe("localhost:3000", nil)
 	if err != nil {
 		log.Fatal(err)
