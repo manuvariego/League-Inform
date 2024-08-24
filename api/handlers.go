@@ -8,24 +8,40 @@ import (
   "log"
   "leagueinform/types"
   "encoding/json"
+  "context"
+  "time"
 )
+func apiHandler(w http.ResponseWriter, r *http.Request) {
+  switch r.Method {
+  case "GET":
+    fmt.Println("testget")
+  case "POST":
+    fmt.Println("testpost")
+  case "DELETE":
+    fmt.Println("testdelete")
 
-// func HandleUserMatches(w http.ResponseWriter, r *http.Request) {
-//   services.GetRiotPuuid(w, r)
-//
-//
-//
-// }
-
-
+  }
+}
 func GetRiotPuuid(w http.ResponseWriter, r *http.Request){
+  ctx, cancel := context.WithTimeout(r.Context(), 5*time.Millisecond)
+  defer cancel()
+
+  fmt.Println("Test")
 
   account1:= &types.Account{}
 
   riotKey := os.Getenv("RIOT_KEY")
 
-  account1.Name = "Krazie"
-  account1.Tag = "LAS"
+  //Hardcoded until god knows when
+
+  fmt.Println("Ingrese el nombre")
+
+  fmt.Scanln(&account1.Name) 
+
+  fmt.Println("Ingrese el tag")
+
+  fmt.Scanln(&account1.Tag) 
+
 
   accountUrl := fmt.Sprintf(`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s?api_key=%s`, account1.Name, account1.Tag, riotKey)
 
@@ -43,6 +59,11 @@ func GetRiotPuuid(w http.ResponseWriter, r *http.Request){
 
   GetRiotMatchesByPuuid(w, r, account1)
   fmt.Println("test")
+
+  x := context.Cause(ctx)
+  fmt.Println(x)
+
+
 
 }
 
