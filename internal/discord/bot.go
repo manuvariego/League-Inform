@@ -21,6 +21,7 @@ func DiscordBot( sess *discordgo.Session) {
       return 
     }
     if m.Content == "matches please" {
+      s.UpdateListeningStatus("matches please")
 
       s.ChannelMessageSend(m.ChannelID, "Please enter your riot name and tag, with this format 'riot-name#tag'")
 
@@ -41,10 +42,10 @@ func DiscordBot( sess *discordgo.Session) {
       acc.Matches = riot.GetMatches(acc)
 
       //only printing the first match for now
-      fmt.Println(acc.Matches[1])
+      fmt.Println(acc.Matches[1].MatchId)
 
       //!!Create function that takes the matches and sends them as a sum of strings (probably xd) 
-      s.ChannelMessageSend(m.ChannelID, "Here are your matches: " + acc.Matches[1])
+      s.ChannelMessageSend(m.ChannelID, "Here are your matches: " + acc.Matches[1].MatchId)
     }
   })
 

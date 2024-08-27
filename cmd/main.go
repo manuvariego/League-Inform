@@ -16,7 +16,7 @@ func main() {
     fmt.Println("Error loading .env file")
   }
 
-  dstoken := os.Getenv("DISCORD_TOKEN")
+  dstoken := os.Getenv("DISCORD_KEY")
 
   // Create a new Discord session using the bot token.
   sess, err := discordgo.New("Bot " + dstoken)
@@ -27,6 +27,9 @@ func main() {
 
   //Calls 'DiscordBot' from the discord package
   discord.DiscordBot(sess)
+  fmt.Scanln()
+
+
 
 }
 

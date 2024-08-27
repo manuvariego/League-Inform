@@ -15,19 +15,24 @@ import (
 func GetId(acc *types.Account) string {
 
   riotKey := os.Getenv("RIOT_KEY")
-  accountUrl := fmt.Sprintf(`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s?api_key=%s`, acc.Name, acc.Tag, riotKey)
-  resp, err := http.Get(accountUrl)
+
+  req, err := http.NewRequest("GET",fmt.Sprintf(`https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s`, acc.Name, acc.Tag), nil) 
   if err != nil {
-    fmt.Println("Error: ", err)
+    log.Fatal(err)
+  }
+
+  req.Header.Set("X-Riot-Token", riotKey)
+  res, err := http.DefaultClient.Do(req)
+  if err != nil {
+    log.Fatal(err)
   }
 
   //Closes the response body after the function ends, defer is a 'late' return it executes after the function ends
-  defer resp.Body.Close()
-
+  defer res.Body.Close()
 
   //Decodes the response body into the account struct
 
-  err = json.NewDecoder(resp.Body).Decode(&acc)
+  err = json.NewDecoder(res.Body).Decode(&acc)
   if err != nil {
     log.Fatal(err)
   }
@@ -38,23 +43,65 @@ func GetId(acc *types.Account) string {
 }
 
 //GetsMatches takes an account and returns the id of the last 20 matches of the account 
-func GetMatches(acc *types.Account) ([]string) {
+func GetMatches(acc *types.Account) ([]types.Match) {
+  var matchIds []string
 
   riotKey := os.Getenv("RIOT_KEY")
 
-  accountUrl := fmt.Sprintf(`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?start=0&count=20&api_key=%s`,acc.Puuid , riotKey)
+  req, err := http.NewRequest("GET",fmt.Sprintf(`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?start=0&count=20`, acc.Puuid), nil) 
+  req.Header.Set("X-Riot-Token", riotKey)
+  res, err := http.DefaultClient.Do(req)
+  if err != nil {
+    log.Fatal(err)
+  }
 
-  resp, err := http.Get(accountUrl)
+
+  //This get requests returns a string of match ID's they should go into the account match structure. 
+  err = json.NewDecoder(res.Body).Decode(&matchIds)
   if err != nil{
     log.Fatal(err)
   }
 
-  err = json.NewDecoder(resp.Body).Decode(&acc.Matches)
-  if err != nil{
-    log.Fatal(err)
-  }
+  //Makes a slice of matches the length of matchIds (normally 20)) 
+  acc.Matches = make([]types.Match, len(matchIds))
 
-  fmt.Println(acc.Matches)
+  for i := 0; i<len(matchIds); i++{
+    fmt.Println(i)
+    acc.Matches[i] = types.Match{
+      MatchId: matchIds[i],
+    }
+  }
   return acc.Matches
-
 }
+// func GetMatchInfo(acc *types.Account) {
+//   // i = 0
+//
+//   riotKey := os.Getenv("RIOT_KEY")
+//
+//   req, err := http.NewRequest("GET",fmt.Sprintf(`https://americas.api.riotgames.com/lol/match/v5/matches/%s`,), nil) 
+//   if err != nil {
+//     log.Fatal(err)
+//   }
+//
+//   req.Header.Set("X-Riot-Token", riotKey)
+//   res, err := http.DefaultClient.Do(req)
+//   if err != nil {
+//     log.Fatal(err)
+//   }
+//
+//   for i < 20 {
+//     accountUrl := fmt.Sprintf(``, matchId, riotKey)
+//     http.NewR
+//
+//
+//   }
+//
+//   accountUrl := fmt.Sprintf(``, matchId, riotKey)
+//
+//   resp, err := http.Get(accountUrl)
+//   if err != nil{
+//     log.Fatal(err)
+//   }
+//
+//   fmt.Println(resp)
+// }
