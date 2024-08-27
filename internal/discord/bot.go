@@ -40,6 +40,8 @@ func DiscordBot( sess *discordgo.Session) {
 
       acc.Puuid = riot.GetId(acc)
       acc.Matches = riot.GetMatches(acc)
+      riot.GetMatchInfo(acc)
+
 
       //only printing the first match for now
       fmt.Println(acc.Matches[1].MatchId)

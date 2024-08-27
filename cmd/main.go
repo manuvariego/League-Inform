@@ -27,6 +27,9 @@ func main() {
 
   //Calls 'DiscordBot' from the discord package
   discord.DiscordBot(sess)
+
+
+  //Temp code to keep the program running
   fmt.Scanln()
 
 

@@ -11,7 +11,14 @@ type Account struct {
 //Probably not necessary, commented for now, (why do I need this?)
 type Match struct {
   MatchId string `json:"matchId"`
+  Info Info `json:"info"`
+}
+
+type Info struct {
   GameResult string `json:"endOfGameResult"`
   GameMode string `json:"gameMode"`
-  GameStartTimestamp string `json:"gameStartTimestamp"`
+  GameStartTimestamp int64 `json:"gameStartTimestamp"`
+
+
 }
+
