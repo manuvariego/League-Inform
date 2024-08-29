@@ -18,6 +18,7 @@ type Info struct {
   GameResult string `json:"endOfGameResult"`
   GameMode string `json:"gameMode"`
   GameStartTimestamp int64 `json:"gameStartTimestamp"`
+  Participants []string `json:"participants"`
 
 
 }
