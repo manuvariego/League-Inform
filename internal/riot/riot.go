@@ -1,6 +1,5 @@
 package riot 
 
-
 import (
   "os"
   "log"
@@ -8,8 +7,18 @@ import (
   "net/http"
   "leagueinform/internal/types"
   "encoding/json"
-
 )
+
+type RiotApi struct{
+  key string
+  
+};
+
+func NewRiotApi() *RiotApi {
+  return &RiotApi{
+    key: os.Getenv("RIOT_KEY"),
+  }
+}
 
 //GetsID takes an account and returns the puuid of the account after accesing the riot api
 func GetId(acc *types.Account) string {
@@ -42,13 +51,20 @@ func GetId(acc *types.Account) string {
 
 }
 
-//GetsMatches takes an account and returns the id of the last 20 matches of the account 
-func GetMatches(acc *types.Account) ([]types.Match) {
-  var matchIds []string
+//GetsMatchestakes an account and returns the id of the last 20 matches of the account 
+func GetMatches(acc *types.Account){
+  // var match types.Match 
 
   riotKey := os.Getenv("RIOT_KEY")
 
   req, err := http.NewRequest("GET",fmt.Sprintf(`https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/%s/ids?start=0&count=20`, acc.Puuid), nil) 
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  sliceMatches := make([]type.Match, 20)
+
+  // acc.Matches := make([]string, 20)
   req.Header.Set("X-Riot-Token", riotKey)
   res, err := http.DefaultClient.Do(req)
   if err != nil {
@@ -57,29 +73,27 @@ func GetMatches(acc *types.Account) ([]types.Match) {
 
 
   //This get requests returns a string of match ID's they should go into the account match structure. 
-  err = json.NewDecoder(res.Body).Decode(&matchIds)
+  err = json.NewDecoder(res.Body).Decode(&sliceMatches)
   if err != nil{
     log.Fatal(err)
   }
 
-  //Makes a slice of matches the length of matchIds (normally 20)) 
-  acc.Matches = make([]types.Match, len(matchIds))
+  acc.Matches = sliceMatches
 
-  for i := 0; i<len(matchIds); i++{
-    acc.Matches[i] = types.Match{
-      MatchId: matchIds[i],
-    }
-  }
-  return acc.Matches
 }
+
 func GetMatchInfo(acc *types.Account) {
-  // i = 0
 
   riotKey := os.Getenv("RIOT_KEY")
 
-  for i := 0; i < len(acc.Matches); i++ {
+  //Should probably use a go routine for this, iterating a get request should probably not be responsability of this function 
 
-    req, err := http.NewRequest("GET",fmt.Sprintf(`https://americas.api.riotgames.com/lol/match/v5/matches/%s`, acc.Matches[i].MatchId), nil) 
+  for i := 0; i < len(acc.Matches); i++ {
+    var match types.Match
+    fmt.Println(len(acc.Matches))
+    fmt.Println(i)
+
+    req, err := http.NewRequest("GET",fmt.Sprintf(`https://americas.api.riotgames.com/lol/match/v5/matches/%s`, acc.Matches[i]), nil) 
     if err != nil {
       log.Fatal(err)
     }
@@ -90,12 +104,24 @@ func GetMatchInfo(acc *types.Account) {
       log.Fatal(err)
     }
 
-    err = json.NewDecoder(res.Body).Decode(&acc.Matches[i])
+    err = json.NewDecoder(res.Body).Decode(&match)
     if err != nil {
       log.Fatal(err)
     }
-    fmt.Println(acc.Matches[i])
+
+    for i, participant:= range match.Info.Participants {
+
+      if participant.Puuid== acc.Puuid {
+        switch participant.Win  {
+        case true:
+          fmt.Println("This is the match", acc.Matches[i])
+          fmt.Println("You won this match")
+        case false: 
+          fmt.Println("This is the match", acc.Matches[i])
+          fmt.Println("You lost this match") 
+        }
+      }
+    } 
 
   }
-
 }

@@ -1,12 +1,14 @@
 package discord
 
 import (
-  "fmt"
-  "github.com/bwmarrin/discordgo"
-  "log"
-  "leagueinform/internal/types"
-  "leagueinform/internal/riot"
+	"fmt"
+	"leagueinform/internal/riot"
+	"leagueinform/internal/types"
+	"log"
+
+	"github.com/bwmarrin/discordgo"
 )
+
 //sess is a discord session initialized in main.go
 func DiscordBot( sess *discordgo.Session) {
 
@@ -21,9 +23,12 @@ func DiscordBot( sess *discordgo.Session) {
       return 
     }
     if m.Content == "matches please" {
-      s.UpdateListeningStatus("matches please")
 
-      s.ChannelMessageSend(m.ChannelID, "Please enter your riot name and tag, with this format 'riot-name#tag'")
+      mess, err := s.ChannelMessageSend(m.ChannelID, "Please enter your riot name and tag, with this format 'riot-name#tag'")
+      if err != nil {
+        log.Fatal(err)
+      }
+      fmt.Println(mess)
 
       //Hardcoded for now because I do not know how to wait for user input before continuing
       m.Content = "Krazie#LAS"
@@ -38,16 +43,17 @@ func DiscordBot( sess *discordgo.Session) {
         i++
       }
 
+
       acc.Puuid = riot.GetId(acc)
-      acc.Matches = riot.GetMatches(acc)
+      riot.GetMatches(acc)
       riot.GetMatchInfo(acc)
 
 
       //only printing the first match for now
-      fmt.Println(acc.Matches[1].MatchId)
+      fmt.Println(acc.Matches[1])
 
       //!!Create function that takes the matches and sends them as a sum of strings (probably xd) 
-      s.ChannelMessageSend(m.ChannelID, "Here are your matches: " + acc.Matches[1].MatchId)
+      // s.ChannelMessageSend(m.ChannelID, "Here are your matches: " + acc.Matches[1])
     }
   })
 

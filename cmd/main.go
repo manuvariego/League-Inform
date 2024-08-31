@@ -6,6 +6,7 @@ import (
   "os"
   "github.com/bwmarrin/discordgo"
   "leagueinform/internal/discord"
+  // "sync"
 )
 
 
