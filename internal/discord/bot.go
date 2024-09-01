@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"leagueinform/internal/riot"
 	"leagueinform/internal/types"
+  "leagueinform/internal/analyze"
 	"log"
-
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -22,12 +22,14 @@ func DiscordBot( sess *discordgo.Session) {
     if m.Author.ID == s.State.User.ID {
       return 
     }
+
     if m.Content == "matches please" {
 
       mess, err := s.ChannelMessageSend(m.ChannelID, "Please enter your riot name and tag, with this format 'riot-name#tag'")
       if err != nil {
         log.Fatal(err)
       }
+
       fmt.Println(mess)
 
       //Hardcoded for now because I do not know how to wait for user input before continuing
@@ -45,12 +47,12 @@ func DiscordBot( sess *discordgo.Session) {
 
 
       acc.Puuid = riot.GetId(acc)
-      riot.GetMatches(acc)
-      riot.GetMatchInfo(acc)
+      matches := riot.GetMatchesById(acc)
+      matchesWon := analyze.AnalyzeMatches(acc, matches)
+      s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("You won %d matches out of 20",matchesWon))
 
 
       //only printing the first match for now
-      fmt.Println(acc.Matches[1])
 
       //!!Create function that takes the matches and sends them as a sum of strings (probably xd) 
       // s.ChannelMessageSend(m.ChannelID, "Here are your matches: " + acc.Matches[1])
