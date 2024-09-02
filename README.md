@@ -10,3 +10,7 @@ For the forseeable future there is no predefined project scope, it will probably
 
 Run the `make` command while in the projects root directory, or navigate to the `/cmd` directory and run `go run main.go`
 
+##Environment variables
+
+In the projects root directory create a `.env` file, add the `RIOT_KEY` and `DISCORD_KEY` variables with their respective keys.
+
