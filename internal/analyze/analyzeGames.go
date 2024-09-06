@@ -16,7 +16,6 @@ func AnalyzeMatches(acc *types.Account, matches []string) int {
 		wg.Add(1)
 		go func(matchID string) {
 			defer wg.Done()
-
 			match := riot.GetMatchInfo(acc, matchID)
 			for _, participant := range match.Info.Participants {
 				if participant.Puuid == acc.Puuid {

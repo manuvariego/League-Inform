@@ -53,3 +53,20 @@ func TestGetMatches(t *testing.T) {
 	wg.Wait()
 
 }
+
+// func TestGetId(t *testing.T) {
+//   acc := types.Account{Name: "Krazie", Tag: "LAS"}
+//   var wg sync.WaitGroup
+//   wg.Add(2)
+//   go func(){
+//     defer wg.Done()
+//     puuid:=GetId(&acc)
+//     acc.Puuid = puuid
+//
+//   }()
+//   wg.Wait()
+//
+//   if acc.Puuid == "" {
+//    t.Error("Expected puuid to be filled")
+//   }
+// }
