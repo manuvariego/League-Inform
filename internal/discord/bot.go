@@ -29,7 +29,7 @@ func DiscordBot(sess *discordgo.Session) {
 			s.ChannelMessageSend(m.ChannelID, "Please enter your riot name and tag, with this format 'riot-name#tag'")
 
 			//Hardcoded for now because I do not know how to wait for user input before continuing
-			m.Content = "Krazie#LAS"
+			m.Content = "nanashiwolf#LAS"
 
 			//Divides the content of the message into the name and tag of the account
 			for i < len(m.Content) {
