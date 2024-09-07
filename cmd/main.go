@@ -1,34 +1,31 @@
 package main
 
 import (
-	"fmt"
-	"leagueinform/internal/discord"
-	"os"
-
-	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
+	"leagueinform/api"
 )
 
 func main() {
+	conn := api.ConnectToDiscord()
+	api.Reader(conn)
 
-	err := godotenv.Load("../.env")
-	if err != nil {
-		fmt.Println("Error loading .env file")
-	}
+	// err := godotenv.Load("../.env")
+	// if err != nil {
+	// 	fmt.Println("Error loading .env file")
+	// }
 
-	dstoken := os.Getenv("DISCORD_KEY")
+	// dstoken := os.Getenv("DISCORD_KEY")
 
 	// Create a new Discord session using the bot token.
-	sess, err := discordgo.New("Bot " + dstoken)
-	if err != nil {
-		fmt.Println("Error creating Discord session: ", err)
-		return
-	}
+	// sess, err := discordgo.New("Bot " + dstoken)
+	// if err != nil {
+	// 	fmt.Println("Error creating Discord session: ", err)
+	// 	return
+	// }
 
 	//Calls 'DiscordBot' from the discord package
-	discord.DiscordBot(sess)
+	// discord.DiscordBot(sess)
 
 	//Temp code to keep the program running
-	fmt.Scanln()
+	// fmt.Scanln()
 
 }
