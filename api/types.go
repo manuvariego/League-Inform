@@ -17,7 +17,7 @@ type WSInfo struct {
 type EventPayload struct {
 	OpCode    int           `json:"op"`
 	Data      HeartBeatData `json:"d"`
-	SeqNumber *int          `json:"s"`
+	SeqNumber int64         `json:"s"`
 	Name      string        `json:"t"`
 }
 
