@@ -21,51 +21,47 @@ func ConnectToDiscord() *WSInfo {
 	}
 	ws.Conn = conn
 
-	// go Reader(conn)
-	// // go Writer(conn)
-
 	return ws
 }
 
 func (ws *WSInfo) Heartbeat(heartbeat float64) {
-	//initialWaitTime in float, <<rand float between 0-1>>
-	initialTime := heartbeat * (rand.Float64())
-	initialDelay := time.Duration(initialTime) * time.Millisecond
-	count := 0
+
+	firstHB := true
 
 	type heartbeats struct {
 		Op  int   `json:"op"`
 		Seq int64 `json:"d"`
 	}
 
-	if count < 1 {
-		//Ticker for the first heartbeat
-		ticker := time.NewTicker(initialDelay)
+	if firstHB {
+
 		fmt.Println("Inside first heartbeat")
-		defer ticker.Stop()
-		select {
-		case <-ticker.C:
-			count += 1
-			seqNumber := atomic.LoadInt64(ws.Seq)
-			ws.m.Lock()
-			ws.Conn.WriteJSON(heartbeats{1, seqNumber})
-			ws.m.Unlock()
+		//Timer for the first heartbeat
+		initialDelay := time.Duration(heartbeat*(rand.Float64())) * time.Millisecond
+		time.Sleep(initialDelay)
+
+		seqNumber := atomic.LoadInt64(ws.Seq)
+		ws.m.Lock()
+		err := ws.Conn.WriteJSON(heartbeats{1, seqNumber})
+		if err != nil {
+			fmt.Println(err)
 		}
+		ws.m.Unlock()
 	}
+
 	//Ticker for the heartbeats not including the first one
 	heartbeatInterval := time.Duration(heartbeat) * time.Millisecond
 	ticker := time.NewTicker(heartbeatInterval)
 
-	for {
-		select {
-		case <-ticker.C:
-			fmt.Println("Inside constant heartbeat")
-			seqNumber := atomic.LoadInt64(ws.Seq)
-			ws.m.Lock()
-			ws.Conn.WriteJSON(heartbeats{1, seqNumber})
-			ws.m.Unlock()
+	for range ticker.C {
+		fmt.Println("Inside constant heartbeat")
+		seqNumber := atomic.LoadInt64(ws.Seq)
+		ws.m.Lock()
+		err := ws.Conn.WriteJSON(heartbeats{1, seqNumber})
+		if err != nil {
+			fmt.Println(err)
 		}
-
+		ws.m.Unlock()
 	}
 }
 
@@ -88,6 +84,8 @@ func (ws *WSInfo) Reader(conn *websocket.Conn) string {
 		fmt.Println(ev)
 
 		atomic.StoreInt64(ws.Seq, ev.SeqNumber)
+
+		//Temp : sends event payload to manageEvent
 		ws.ManageEvent(ev)
 	}
 }
