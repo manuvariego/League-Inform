@@ -1,9 +1,7 @@
-package discord
+package internal
 
 import (
 	"fmt"
-	"leagueinform/internal/analyze"
-	"leagueinform/internal/riot"
 	"leagueinform/internal/types"
 	"log"
 
@@ -41,9 +39,9 @@ func DiscordBot(sess *discordgo.Session) {
 				i++
 			}
 
-			acc.Puuid = riot.GetId(acc)
-			matches := riot.GetMatchesById(acc)
-			matchesWon := analyze.AnalyzeMatches(acc, matches)
+			acc.Puuid = GetId(acc)
+			matches := GetMatchesById(acc)
+			matchesWon := AnalyzeMatches(acc, matches)
 
 			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("You won %d matches out of 20", matchesWon))
 			s.ChannelMessageSend(m.ChannelID, "Want more information?")

@@ -1,8 +1,7 @@
-package analyze
+package internal
 
 import (
 	"fmt"
-	"leagueinform/internal/riot"
 	"leagueinform/internal/types"
 	"sync"
 	"sync/atomic"
@@ -14,11 +13,11 @@ func AnalyzeMatches(acc *types.Account, matches []string) uint64 {
 	// var mu sync.Mutex
 	var epica atomic.Uint64
 
-	for i := 0; i < len(matches); i++ {
+	for _, match := range matches {
 		wg.Add(1)
 		go func(matchID string) {
 			defer wg.Done()
-			match := riot.GetMatchInfo(acc, matchID)
+			match := GetMatchInfo(acc, matchID)
 			for _, participant := range match.Info.Participants {
 				if participant.Puuid == acc.Puuid {
 					if participant.Win {
@@ -34,7 +33,7 @@ func AnalyzeMatches(acc *types.Account, matches []string) uint64 {
 					}
 				}
 			}
-		}(matches[i])
+		}(match)
 	}
 
 	wg.Wait()

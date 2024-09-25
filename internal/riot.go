@@ -1,4 +1,4 @@
-package riot
+package internal
 
 import (
 	"encoding/json"
