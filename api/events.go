@@ -11,5 +11,4 @@ func (ws *WSInfo) ManageEvent(ev *EventPayload) {
 		fmt.Println("manageEvent func defaulted")
 		return
 	}
-
 }

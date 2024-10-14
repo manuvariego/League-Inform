@@ -1,8 +1,3 @@
 package test
 
-
-
-
-func Test
-
-
+// func Test
