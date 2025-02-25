@@ -7,7 +7,8 @@ import (
 func main() {
 
 	ws := api.ConnectToDiscord()
-	ws.Reader(ws.Conn)
+	ws.Reader()
+	// ws.Identify()
 
 	// err := godotenv.Load("../.env")
 	// if err != nil {

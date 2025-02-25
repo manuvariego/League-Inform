@@ -24,3 +24,15 @@ type EventPayload struct {
 type HeartBeatData struct {
 	HeartBeat float64 `json:"heartbeat_interval"`
 }
+
+type IdentifyData struct {
+	Token   string             `json:"token"`
+	Prop    IdentifyProperties `json:"properties"`
+	Intents int                `json:"intents"`
+}
+
+type IdentifyProperties struct {
+	Os      string `json:"os"`
+	Browser string `json:"browser"`
+	Device  string `json:"device"`
+}

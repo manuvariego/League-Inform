@@ -65,31 +65,42 @@ func (ws *WSInfo) Heartbeat(heartbeat float64) {
 	}
 }
 
-func (ws *WSInfo) Reader(conn *websocket.Conn) string {
+func (ws *WSInfo) Write() {
+	s := "hey brother"
+	bytesArray := []byte(s)
+	err := ws.Conn.WriteMessage(1, bytesArray)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+
+func (ws *WSInfo) Reader() string {
 
 	for {
-		ev := &EventPayload{}
+		type opStruct struct {
+			Op int `json:"op"`
+		}
 
-		_, p, err := conn.ReadMessage()
+		var op opStruct
+		// ev := &EventPayload{}
+
+		_, p, err := ws.Conn.ReadMessage()
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		err = json.Unmarshal(p, &ev)
+		err = json.Unmarshal(p, &op)
 		if err != nil {
 			fmt.Println(err)
 		}
 
 		//Temp : Prints event payload
-		fmt.Println(ev)
+		fmt.Println(op)
 
-		atomic.StoreInt64(ws.Seq, ev.SeqNumber)
+		// atomic.StoreInt64(ws.Seq, ev.SeqNumber)
 
 		//Temp : sends event payload to manageEvent
-		ws.ManageEvent(ev)
+		// ws.ManageEvent(ev)
 	}
 }
-
-// func Writer(conn *websocket.Conn, mess Message) {
-// 	w, err := conn.NextWriter
-// }
