@@ -1,10 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"leagueinform/api"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+
+	err := godotenv.Load("../.env")
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
 
 	ws := api.ConnectToDiscord()
 	ws.Reader()

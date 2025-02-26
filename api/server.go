@@ -78,29 +78,30 @@ func (ws *WSInfo) Write() {
 func (ws *WSInfo) Reader() string {
 
 	for {
-		type opStruct struct {
-			Op int `json:"op"`
+		type eventPayload struct {
+			Opcode    int    `json:"op"`
+			SeqNumber int64  `json:"s"`
+			Name      string `json:"t"`
 		}
 
-		var op opStruct
-		// ev := &EventPayload{}
+		var event eventPayload
 
 		_, p, err := ws.Conn.ReadMessage()
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		err = json.Unmarshal(p, &op)
+		err = json.Unmarshal(p, &event)
 		if err != nil {
 			fmt.Println(err)
 		}
 
 		//Temp : Prints event payload
-		fmt.Println(op)
+		fmt.Println(event)
 
-		// atomic.StoreInt64(ws.Seq, ev.SeqNumber)
+		atomic.StoreInt64(ws.Seq, event.SeqNumber)
 
 		//Temp : sends event payload to manageEvent
-		// ws.ManageEvent(ev)
+		ws.ManageEvent(event.Opcode, p)
 	}
 }
