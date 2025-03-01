@@ -26,6 +26,9 @@ func (ws *WSInfo) ManageEvent(opCode int, data []byte) {
 	case 2:
 		fmt.Println("test")
 
+	case 0:
+		fmt.Println("test")
+
 	default:
 		fmt.Println("manageEvent func defaulted, running intent")
 		return

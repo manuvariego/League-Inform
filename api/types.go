@@ -36,3 +36,11 @@ type IdentifyProperties struct {
 	Browser string `json:"browser"`
 	Device  string `json:"device"`
 }
+
+// type ReadyData struct {
+// Version int `json:"v"`
+// User string
+// Guilds string
+// SessId string
+// ResumeUrl
+// }
