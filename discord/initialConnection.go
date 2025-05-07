@@ -1,4 +1,4 @@
-package api
+package discord
 
 func NewWSConnection() *WSInfo {
 	return &WSInfo{

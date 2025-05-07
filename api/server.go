@@ -3,105 +3,46 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand/v2"
-	"sync/atomic"
-	"time"
+	"leagueinform/internal/types"
+	"log"
+	"net/http"
 
-	"github.com/gorilla/websocket"
+	"gorm.io/gorm"
 )
 
-func ConnectToDiscord() *WSInfo {
-	ws := NewWSConnection()
-
-	//Returns a discord websocket connection
-	dialer := websocket.DefaultDialer
-	conn, _, err := dialer.Dial("wss://gateway.discord.gg/?v=10&encoding=json", nil)
-	if err != nil {
-		fmt.Println(err)
-	}
-	ws.Conn = conn
-
-	return ws
+type APIHandler struct {
+	db *gorm.DB
 }
 
-func (ws *WSInfo) Heartbeat(heartbeat float64) {
+func (h *APIHandler) createAccount(w http.ResponseWriter, req *http.Request) {
+	if req.Method == "POST" {
+		var acc types.Account
 
-	firstHB := true
-
-	type heartbeats struct {
-		Op  int   `json:"op"`
-		Seq int64 `json:"d"`
-	}
-
-	if firstHB {
-
-		fmt.Println("Inside first heartbeat")
-		//Timer for the first heartbeat
-		initialDelay := time.Duration(heartbeat*(rand.Float64())) * time.Millisecond
-		time.Sleep(initialDelay)
-
-		seqNumber := atomic.LoadInt64(ws.Seq)
-		ws.m.Lock()
-		err := ws.Conn.WriteJSON(heartbeats{1, seqNumber})
+		err := json.NewDecoder(req.Body).Decode(&acc)
 		if err != nil {
-			fmt.Println(err)
+			http.Error(w, "Invalid JSON", http.StatusBadRequest)
+			return
 		}
-		ws.m.Unlock()
-	}
 
-	//Ticker for the heartbeats not including the first one
-	heartbeatInterval := time.Duration(heartbeat) * time.Millisecond
-	ticker := time.NewTicker(heartbeatInterval)
-
-	for range ticker.C {
-		fmt.Println("Inside constant heartbeat")
-		seqNumber := atomic.LoadInt64(ws.Seq)
-		ws.m.Lock()
-		err := ws.Conn.WriteJSON(heartbeats{1, seqNumber})
-		if err != nil {
-			fmt.Println(err)
+		rs := h.db.Where(&types.Account{Name: acc.Name, Tag: acc.Tag}).Attrs(&types.Account{Name: acc.Name, Tag: acc.Tag}).FirstOrCreate(&acc)
+		if rs.Error != nil {
+			log.Println("Query error:", rs.Error)
 		}
-		ws.m.Unlock()
-	}
-}
 
-func (ws *WSInfo) Write() {
-	s := "hey brother"
-	bytesArray := []byte(s)
-	err := ws.Conn.WriteMessage(1, bytesArray)
-	if err != nil {
-		fmt.Println(err)
+		// rs := h.db.Create(&acc)
+
 	}
 
 }
 
-func (ws *WSInfo) Reader() string {
+func (h *APIHandler) login(w http.ResponseWriter, req *http.Request) {
 
-	for {
-		type eventPayload struct {
-			Opcode    int    `json:"op"`
-			SeqNumber int64  `json:"s"`
-			Name      string `json:"t"`
-		}
+}
 
-		var event eventPayload
+func RunServer(DB *gorm.DB) {
+	handler := &APIHandler{db: DB}
 
-		_, p, err := ws.Conn.ReadMessage()
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		err = json.Unmarshal(p, &event)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		//Temp : Prints event payload
-		fmt.Println(event)
-
-		atomic.StoreInt64(ws.Seq, event.SeqNumber)
-
-		//Temp : sends event payload to manageEvent
-		ws.ManageEvent(event.Opcode, p)
-	}
+	http.HandleFunc("/hey2", handler.createAccount)
+	fmt.Println("test")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

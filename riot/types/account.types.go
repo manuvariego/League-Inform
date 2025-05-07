@@ -1,6 +1,9 @@
 package types
 
+import "gorm.io/gorm"
+
 type Account struct {
+	gorm.Model
 	Name  string `json:"name"`
 	Tag   string `json:"tag"`
 	Puuid string `json:"puuid"`
